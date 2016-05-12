@@ -14,13 +14,16 @@ static char decodingTable[128];
 static NSString* decodingTableLock = @"decodingTableLock";
 
 + (NSString*) urlEncode: (NSString*)urlString{
-    return (__bridge NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (__bridge CFStringRef)urlString, NULL,CFSTR("!*'();:@&=+$,/?%#[]"),  kCFStringEncodingUTF8);
+
+    NSCharacterSet* set = [[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[]"] invertedSet];
+    return [urlString stringByAddingPercentEncodingWithAllowedCharacters:set];
 }
 
 + (NSString*) urlDecode: (NSString*)urlString{
+    
     return [[urlString
       stringByReplacingOccurrencesOfString:@"+" withString:@" "]
-     stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+     stringByRemovingPercentEncoding];
 }
 
 + (NSString*) createHashWithData:(NSData*)data{
@@ -82,7 +85,7 @@ static NSString* decodingTableLock = @"decodingTableLock";
 		inputLength--;
 	}
 	
-	int outputLength = inputLength * 3 / 4;
+	NSInteger outputLength = inputLength * 3 / 4;
 	NSMutableData* outputData = [NSMutableData dataWithLength:outputLength];
 	uint8_t* output = outputData.mutableBytes;
     
@@ -141,20 +144,7 @@ static NSString* decodingTableLock = @"decodingTableLock";
         return @"";
     }
     
-    NSMutableString* tags;
-    
-    for (NSString *element in tagSet) {
-        if(!tags)
-        {
-            tags=[[NSMutableString alloc] initWithString:element];
-        }
-        else
-        {
-            [tags appendString:[NSString stringWithFormat:@",%@",element]];
-        }
-    }
-    
-    return tags;
+    return [[tagSet allObjects] componentsJoinedByString:@","];
 }
 
 NSString* const domain = @"WindowsAzureMessaging";
