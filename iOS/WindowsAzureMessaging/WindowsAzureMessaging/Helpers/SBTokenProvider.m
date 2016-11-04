@@ -268,7 +268,6 @@ const int defaultTimeToExpireinMins = 20;
 
 + (NSString *)ExtractToken:(NSData *)data
 {
-    NSString *expireInSeconds;
     NSString *token;
     NSString* rawStr= [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSArray *fields = [rawStr componentsSeparatedByString:@"&"];
@@ -287,10 +286,6 @@ const int defaultTimeToExpireinMins = 20;
         if([key isEqualToString:@"wrap_access_token"])
         {
             token = [NSString stringWithFormat:@"WRAP access_token=\"%@\"",value];
-        }
-        else
-        {
-            expireInSeconds = value;
         }
     }
     
